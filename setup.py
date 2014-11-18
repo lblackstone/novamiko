@@ -19,10 +19,10 @@ setup(
         "Development Status :: 3 - Alpha",
         "Topic :: Utilities",
     ],
-    requires=(
+    install_requires=(
         'netaddr',
         'paramiko',
-        'novaclient',
+        'novaclient'
     ),
 
 )

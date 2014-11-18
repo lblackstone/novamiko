@@ -29,7 +29,8 @@ class NoNetworkException(NovaMikoException):
 class NovaMikoInstance(object):
     def __init__(self, nova, name, image, flavor,
                  config_drive=None, userdata=None,
-                 ssh_connect_retry_limit=3):
+                 ssh_connect_retry_limit=3,
+                 nova_extras=None):
         self.nova = nova
         self.ssh = paramiko_client.SSHClient()
         self.ssh.set_missing_host_key_policy(paramiko_client.WarningPolicy())
@@ -37,16 +38,18 @@ class NovaMikoInstance(object):
         (self.instance,
          self.password) = self._create_instance(name, image, flavor,
                                                 config_drive=config_drive,
-                                                userdata=userdata)
+                                                userdata=userdata,
+                                                nova_extras=nova_extras)
 
         self._ssh_connect(ssh_connect_retry_limit)
 
     def _create_instance(self, name, image, flavor,
-                         config_drive=None, userdata=None):
+                         config_drive=None, userdata=None, nova_extras=None):
         return boot_instance(self.nova, name, image, flavor,
                              config_drive=config_drive,
                              userdata=userdata,
-                             sleep_after_build=15)
+                             sleep_after_build=15,
+                             nova_extras=nova_extras)
 
     def _get_proxy_cmd(self, hostname):
         ssh_config_path = os.path.expanduser('~/.ssh/config')
@@ -94,6 +97,11 @@ class NovaMikoInstance(object):
     def exec_streams(self, cmd):
         return self.ssh.exec_command(self._add_paths(cmd))
 
+    def exec_out(self, cmd):
+        std_in, std_out, std_err = self.exec_streams(cmd)
+        std_in.close()
+        return std_out.readlines()
+
     def exec_return_code(self, cmd):
         session = self.ssh.get_transport().open_session()
         session.exec_command(self._add_paths(cmd))
@@ -136,12 +144,12 @@ def wait_for_status(instance, status='ACTIVE', timeout=300):
 def boot_instance(nova, name, image, flavor,
                   nics=DEFAULT_NICS,
                   config_drive=None, userdata=None,
-                  sleep_after_build=45):
-    hints = {}
+                  sleep_after_build=45,
+                  nova_extras=None):
 
     server = nova.servers.create(name, image, flavor,
-                                 nics=nics, scheduler_hints=hints,
-                                 config_drive=config_drive, userdata=userdata)
+                                 nics=nics, config_drive=config_drive,
+                                 userdata=userdata, **nova_extras)
 
     admin_password = server.adminPass
 
