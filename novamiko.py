@@ -161,6 +161,8 @@ def boot_instance(nova, name, image, flavor,
                   sleep_after_build=45,
                   nova_extras=None):
 
+    nova_extras = nova_extras or dict()
+
     server = nova.servers.create(name, image, flavor,
                                  nics=nics, config_drive=config_drive,
                                  userdata=userdata, **nova_extras)
