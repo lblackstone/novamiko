@@ -6,7 +6,7 @@ description = "Wrapper around Openstack Nova and Paramiko"
 
 setup(
     name="novamiko",
-    version="0.0.1",
+    version="0.0.2",
     author="Andrew Melton",
     author_email="andrew.melton@rackspace.com",
     description=description,
@@ -22,7 +22,7 @@ setup(
     install_requires=(
         'netaddr',
         'paramiko',
-        'novaclient'
+        'python-novaclient'
     ),
 
 )
