@@ -41,7 +41,7 @@ class NoNetworkException(NovaMikoException):
 
 
 class NovaMikoInstance(object):
-    def __init__(self, nova, name, image, flavor,
+    def __init__(self, nova, name, image, flavor, nics=DEFAULT_NICS,
                  config_drive=None, userdata=None,
                  ssh_connect_retry_limit=3,
                  nova_extras=None):
@@ -50,16 +50,16 @@ class NovaMikoInstance(object):
         self.ssh.set_missing_host_key_policy(paramiko_client.WarningPolicy())
 
         (self.instance,
-         self.password) = self._create_instance(name, image, flavor,
+         self.password) = self._create_instance(name, image, flavor, nics,
                                                 config_drive=config_drive,
                                                 userdata=userdata,
                                                 nova_extras=nova_extras)
 
         self._ssh_connect(ssh_connect_retry_limit)
 
-    def _create_instance(self, name, image, flavor,
+    def _create_instance(self, name, image, flavor, nics,
                          config_drive=None, userdata=None, nova_extras=None):
-        return boot_instance(self.nova, name, image, flavor,
+        return boot_instance(self.nova, name, image, flavor, nics,
                              config_drive=config_drive,
                              userdata=userdata,
                              sleep_after_build=15,
