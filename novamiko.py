@@ -108,17 +108,17 @@ class NovaMikoInstance(object):
         paths_str = ':'.join(paths)
         return 'PATH={} {}'.format(paths_str, cmd)
 
-    def exec_streams(self, cmd):
-        return self.ssh.exec_command(self._add_paths(cmd))
+    def exec_streams(self, cmd, timeout=None):
+        return self.ssh.exec_command(self._add_paths(cmd), timeout=timeout)
 
-    def exec_out(self, cmd):
-        std_in, std_out, std_err = self.exec_streams(cmd)
+    def exec_out(self, cmd, timeout=None):
+        std_in, std_out, std_err = self.exec_streams(cmd, timeout=timeout)
         std_in.close()
         return std_out.readlines()
 
-    def exec_return_code(self, cmd):
+    def exec_return_code(self, cmd, timeout=None):
         session = self.ssh.get_transport().open_session()
-        session.exec_command(self._add_paths(cmd))
+        session.exec_command(self._add_paths(cmd), timeout=timeout)
         return session.recv_exit_status()
 
     def destroy(self):
