@@ -117,8 +117,8 @@ class NovaMikoInstance(object):
         return std_out.readlines()
 
     def exec_return_code(self, cmd, timeout=None):
-        session = self.ssh.get_transport().open_session()
-        session.exec_command(self._add_paths(cmd), timeout=timeout)
+        session = self.ssh.get_transport().open_session(timeout=timeout)
+        session.exec_command(self._add_paths(cmd))
         return session.recv_exit_status()
 
     def destroy(self):
